@@ -13,9 +13,10 @@ namespace CSF_PayACHServive
     // NOTE: para iniciar el Cliente de prueba WCF para probar este servicio, seleccione Service1.svc o Service1.svc.cs en el Explorador de soluciones e inicie la depuración.
     public class CSF_PayACHServive : ICSF_PayACHServive
     {
-        public string GetData(int value)
+        public string GetData(string JSONRequest)
         {
-            return string.Format("You entered: {0}", value);
+            ClsCore cre = new ClsCore();
+            return JSONRequest;
         }
 
         public CompositeType GetDataUsingDataContract(CompositeType composite)

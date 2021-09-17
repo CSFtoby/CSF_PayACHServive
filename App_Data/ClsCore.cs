@@ -6,6 +6,8 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CSF_PayACHServive
 {
@@ -19,6 +21,11 @@ namespace CSF_PayACHServive
         {
             Logs.Guarda_Log("Logs", mensaje);
             return "OK";
+        }
+
+        public string porcessRequest(string JSONRequest) {
+            string JSONResponce = string.Empty;
+            return JSONResponce;
         }
 
     }
