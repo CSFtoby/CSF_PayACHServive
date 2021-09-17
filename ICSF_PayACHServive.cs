@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Data;
 
 namespace CSF_PayACHServive
 {
@@ -14,7 +15,7 @@ namespace CSF_PayACHServive
     {
 
         [OperationContract]
-        string GetData(int value);
+        string GetData(string JSONRequest);
 
         [OperationContract]
         CompositeType GetDataUsingDataContract(CompositeType composite);
