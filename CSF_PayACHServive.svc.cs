@@ -16,7 +16,7 @@ namespace CSF_PayACHServive
         public string GetData(string JSONRequest)
         {
             ClsCore cre = new ClsCore();
-            return JSONRequest;
+            return cre.porcessRequest(JSONRequest);
         }
 
         public CompositeType GetDataUsingDataContract(CompositeType composite)
