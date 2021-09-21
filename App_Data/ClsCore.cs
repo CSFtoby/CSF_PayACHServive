@@ -18,6 +18,9 @@ namespace CSF_PayACHServive
         Logs logs = new Logs();
         DataAccess da = new DataAccess();
 
+        bool estado = false;
+        bool error_interno = false;
+
         public string log(string mensaje)
         {
             Logs.Guarda_Log("Logs", mensaje);
@@ -51,61 +54,106 @@ namespace CSF_PayACHServive
             try {
                 var JsonRes = JsonConvert.DeserializeObject<ClsTransfer>(JSONRequest);
 
-                if (JsonRes.user.Equals(credencials.User) && JsonRes.pass.Equals(credencials.pass)) {
-                    accountExist = da.valida_esistencia_cuenta(JsonRes.accountNumber);
-                    if (accountExist){
-                        bloqued = da.valida_bloqueo(JsonRes.accountNumber);
-                        if (bloqued)
+                if (JsonRes.typeTransaction.Equals("Transfer") || JsonRes.typeTransaction.Equals("account search"))
+                {
+                    if (JsonRes.user.Equals(credencials.User) && JsonRes.pass.Equals(credencials.pass))
+                    {
+                        accountExist = da.valida_esistencia_cuenta(JsonRes.accountNumber);
+                        if (accountExist)
+                        {
+                            bloqued = da.valida_bloqueo(JsonRes.accountNumber);
+                            if (bloqued)
+                            {
+                                status.StatusCode = "0000";
+                                status.StatusMessage = "Rejected Request";
+                                status.SubStatusCode = "0006";
+                                status.SubStatusMessage = "Blocked Account";
+                            }
+                            else
+                            {
+                                exist = da.valida_cuenta(JsonRes.accountNumber);
+                                if (exist)
+                                {
+                                    status.StatusCode = "0000";
+                                    status.StatusMessage = "Rejected Request";
+                                    status.SubStatusCode = "0004";
+                                    status.SubStatusMessage = "Account Closed";
+                                }
+                                else
+                                {
+                                    status.StatusCode = "5000";
+                                    status.StatusMessage = "Completed";
+                                    status.SubStatusCode = "5001";
+                                    status.SubStatusMessage = "Success";
+                                    estado = true;
+                                }
+                            }
+                        }
+                        else
                         {
                             status.StatusCode = "0000";
                             status.StatusMessage = "Rejected Request";
-                            status.SubStatusCode = "0006";
-                            status.SubStatusMessage = "Blocked Account";
+                            status.SubStatusCode = "0005";
+                            status.SubStatusMessage = "Nonexistent Account";
+                            estado = false;
                         }
-                        else {
-                            exist = da.valida_cuenta(JsonRes.accountNumber);
-                            if (exist) {
-                                status.StatusCode = "0000";
-                                status.StatusMessage = "Rejected Request";
-                                status.SubStatusCode = "0004";
-                                status.SubStatusMessage = "Account Closed";
-                            }
-                            else
+                    }
+                    else
+                    {
+                        status.StatusCode = "1000";
+                        status.StatusMessage = "Internal Error";
+                        status.SubStatusCode = "1002";
+                        status.SubStatusMessage = "Authentication Error";
+                        estado = false;
+                    }
+                }
+                else {
+                   
+                    if (JsonRes.typeTransaction.Equals("status operation"))
+                    {
+                        bool transferExist = false; //falta metodo para verificar existencia 
+                        if (JsonRes.user.Equals(credencials.User) && JsonRes.pass.Equals(credencials.pass))
+                        {
+                            if (transferExist)
                             {
                                 status.StatusCode = "5000";
                                 status.StatusMessage = "Completed";
                                 status.SubStatusCode = "5001";
                                 status.SubStatusMessage = "Success";
-                                //estado = true;
+                                estado = true;
+                            }
+                            else {
+                                status.StatusCode = "1000";
+                                status.StatusMessage = "Internal Error";
+                                status.SubStatusCode = "1004";
+                                status.SubStatusMessage = "non-existent transfer";
                             }
                         }
+                        else
+                        {
+                            status.StatusCode = "1000";
+                            status.StatusMessage = "Internal Error";
+                            status.SubStatusCode = "1002";
+                            status.SubStatusMessage = "Authentication Error";
+                            estado = false;
+                        }
                     }
-                    else
-                    {
-                        status.StatusCode = "0000";
-                        status.StatusMessage = "Rejected Request";
-                        status.SubStatusCode = "0005";
-                        status.SubStatusMessage = "Nonexistent Account";
-                        //estado = false;
+                    else {
+                        status.StatusCode = "1000";
+                        status.StatusMessage = "Internal Error";
+                        status.SubStatusCode = "1003";
+                        status.SubStatusMessage = "invalid operation";
                     }
-                }
-                else
-                {
-                    status.StatusCode = "0100";
-                    status.StatusMessage = "Internal Error";
-                    status.SubStatusCode = "0102";
-                    status.SubStatusMessage = "Authentication Error";
-                    //estado = false;
                 }
             }
             catch (Exception ex)
             {
-                status.StatusCode = "01000";
+                status.StatusCode = "1000";
                 status.StatusMessage = "Internal Error";
-                status.SubStatusCode = "01001";
+                status.SubStatusCode = "1001";
                 status.SubStatusMessage = "System Error";
 
-                //error_interno = true;
+                error_interno = true;
 
                 //bool save = da.insert_Transfer_fist(transaction.chanel, transaction.user, transaction.pass, transaction.reference_code, transaction.service, transaction.first_name, transaction.last_name, transaction.account_number, transaction.Bank_code);
                 //da.inser_Error(transaction.account_number, status.SubStatusMessage);
@@ -115,8 +163,19 @@ namespace CSF_PayACHServive
             return JSONResponce;
         }
 
-        void Responce(ClsTransfer transfer, ClsStatus status, ref string JSONResponse, string transctionType = " ") { 
-        
+        void Responce(ClsTransfer transfer, ClsStatus status, ref string JSONResponse, string transctionType = " ") {
+            string oErr = string.Empty;
+            try { 
+                
+            }
+            catch (Exception ex)
+            {
+                status.StatusCode = "1000";
+                status.StatusMessage = "Internal Error";
+                status.SubStatusCode = "1001";
+                status.SubStatusMessage = "System Error";
+                oErr = ex.Message;
+            }
         }
 
     }
