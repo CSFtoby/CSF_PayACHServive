@@ -16,8 +16,8 @@ namespace CSF_PayACHServive
         public string idRecived { get; set; }
         public string idSend { get; set; }
         public string nameRecived { get; set; }
-        public string codeRecived { get; set; }
-        public string codeSend { get; set; }
+        public string codeBankRecived { get; set; }
+        public string codeBankSend { get; set; }
         public string accountNumber { get; set; }
         public decimal amount { get; set; }
         public string bankCode { get; set; }

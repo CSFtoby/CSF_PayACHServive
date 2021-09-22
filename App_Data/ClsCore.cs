@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -31,7 +32,6 @@ namespace CSF_PayACHServive
 
             ClsCredencials credencials = new ClsCredencials();
             ClsStatus status = new ClsStatus();
-            ClsTransfer transfer = new ClsTransfer();
             string transtring = string.Empty;
             string JSONResponce = string.Empty;
             bool exist = false;
@@ -40,19 +40,20 @@ namespace CSF_PayACHServive
 
             credencials.User = "ACHCoopsafa";
             credencials.pass = "C00psaF@1967$";
-
-            if (string.IsNullOrEmpty(JSONRequest)) {
-                status.StatusCode = "0100";
-                status.StatusMessage = "Internal Error";
-                status.SubStatusCode = "0101";
-                status.SubStatusMessage = "Request cannot be null or empty";
-
-                Responce(transfer, status, ref JSONResponce);
-                return JSONResponce;
-            }
-
-            try {
+            
+            try
+            {
                 var JsonRes = JsonConvert.DeserializeObject<ClsTransfer>(JSONRequest);
+                if (string.IsNullOrEmpty(JSONRequest)) {
+                    status.StatusCode = "0100";
+                    status.StatusMessage = "Internal Error";
+                    status.SubStatusCode = "0101";
+                    status.SubStatusMessage = "Request cannot be null or empty";
+
+                    Responce(JsonRes, status, ref JSONResponce);
+                    log(status.StatusCode + " " + status.StatusMessage+ " " + status.SubStatusCode + " " + status.SubStatusMessage);
+                    return JSONResponce;
+                }
 
                 if (JsonRes.typeTransaction.Equals("Transfer") || JsonRes.typeTransaction.Equals("account search"))
                 {
@@ -145,6 +146,9 @@ namespace CSF_PayACHServive
                         status.SubStatusMessage = "invalid operation";
                     }
                 }
+
+                Responce(JsonRes, status, ref JSONResponce);
+
             }
             catch (Exception ex)
             {
@@ -153,6 +157,7 @@ namespace CSF_PayACHServive
                 status.SubStatusCode = "1001";
                 status.SubStatusMessage = "System Error";
 
+                log(status.StatusCode + " " + status.StatusMessage + " " + status.SubStatusCode + " " + status.SubStatusMessage);
                 error_interno = true;
 
                 //bool save = da.insert_Transfer_fist(transaction.chanel, transaction.user, transaction.pass, transaction.reference_code, transaction.service, transaction.first_name, transaction.last_name, transaction.account_number, transaction.Bank_code);
@@ -165,7 +170,59 @@ namespace CSF_PayACHServive
 
         void Responce(ClsTransfer transfer, ClsStatus status, ref string JSONResponse, string transctionType = " ") {
             string oErr = string.Empty;
-            try { 
+            try
+            {
+                DataTable personal = da.Personal_data(transfer.accountNumber);
+                string id = string.Empty;
+                string jsonString = string.Empty;
+
+                foreach (DataRow row in personal.Rows)
+                {
+                    id = row["ID_NUMBER"].ToString();
+                }
+
+                if (transfer.idRecived.Equals(id))
+                {
+                    DataTable dt = da.Data_Transaction(transfer.accountNumber);
+                    var responce = new ClsTransferResponse
+                    {
+                        statusRequest = "Success",
+                        result = "Ok",
+                        descriptionStatus = "La transacción de realizó con exito",
+                        transactionId = 1,
+                        statusResponse = new ClsStatus() { 
+                            StatusCode = status.StatusCode,
+                            StatusMessage = status.StatusMessage,
+                            SubStatusCode = status.SubStatusCode,
+                            SubStatusMessage = status.SubStatusMessage
+                        }
+                    };
+
+                    JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
+                }
+                else {
+                    status.StatusCode = "0000";
+                    status.StatusMessage = "Internal Error";
+                    status.SubStatusCode = "0008";
+                    status.SubStatusMessage = "Rejected by internal validation";
+
+                    var responce = new ClsTransferResponse
+                    {
+                        statusRequest = "Rejected",
+                        result = "Bad",
+                        descriptionStatus = "La transaccion fallo",
+                        transactionId = 0,
+                        statusResponse = new ClsStatus()
+                        {
+                            StatusCode = status.StatusCode,
+                            StatusMessage = status.StatusMessage,
+                            SubStatusCode = status.SubStatusCode,
+                            SubStatusMessage = status.SubStatusMessage
+                        }
+                    };
+
+                    JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
+                }
                 
             }
             catch (Exception ex)

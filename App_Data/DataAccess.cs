@@ -43,10 +43,10 @@ namespace CSF_PayACHServive
                     if (reader.HasRows)
                     {
                         reader.Read();
-                        if (reader["CANCELADA_B"].ToString() == "N")
-                            returno = true;
-                        else
+                        if (reader["CANCELADA_B"].ToString().Equals("N"))
                             returno = false;
+                        else
+                            returno = true;
                     }
                 }
             }
@@ -82,10 +82,10 @@ namespace CSF_PayACHServive
                     if (reader.HasRows)
                     {
                         reader.Read();
-                        if (reader["BLOQUEADA_B"].ToString() == "N")
-                            returno = true;
-                        else
+                        if (reader["BLOQUEADA_B"].ToString().Equals("N"))
                             returno = false;
+                        else
+                            returno = true;
                     }
                 }
             }
@@ -199,7 +199,41 @@ namespace CSF_PayACHServive
             return returno;
         }
 
+        //apartado para encontrar los datos que tienen que enviarse al procedimiento de movimientos diarios y el credito
+        public DataTable Data_Transaction(string accaount)
+        {
+            DataTable da = new DataTable();
+            OracleCommand command = new OracleCommand();
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
+                {
+                    string sql = @"select CODIGO_AGENCIA, CODIGO_EMPRESA, CODIGO_SUB_APLICACION
+                                    from MCA_CUENTAS
+                                    where NUMERO_CUENTA = :pa_accaount";
 
+                    command.CommandText = sql;
+                    command.Connection = connection;
+                    command.Parameters.Add("pa_accaount", accaount);
+
+                    OracleDataAdapter dataAdapter = new OracleDataAdapter(command);
+
+                    try
+                    {
+                        dataAdapter.Fill(da);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("Error en " + e.TargetSite.ToString() + " " + e.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en " + ex.TargetSite + "  " + ex.Message);
+            }
+            return da;
+        }
         #endregion
     }
 }
