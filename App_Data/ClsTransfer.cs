@@ -15,6 +15,7 @@ namespace CSF_PayACHServive
         public string pass { get; set; }
         public string idRecived { get; set; }
         public string idSend { get; set; }
+        public DateTime dateTransaction { get; set; }
         public string nameRecived { get; set; }
         public string codeBankRecived { get; set; }
         public string codeBankSend { get; set; }
@@ -23,5 +24,6 @@ namespace CSF_PayACHServive
         public string bankCode { get; set; }
         public string concept { get; set; }
         public string nameTransffer { get; set; }
+        public ClsStatus statusResponse { get; set; }
     }
 }

@@ -152,8 +152,7 @@ namespace CSF_PayACHServive
                                    CTS.CODIGO_SUB_APLICACION ACCOUNT_TYPE, 
                                    REPLACE(CL.NUMERO_IDENTIFICACION,'-','') ID_NUMBER,
                                    CL.CODIGO_TIPO_IDENTIFICACION ID_TYPE,
-                                   DIR.TELEFONO PHONE_NUMBER,
-                                   CL.SEXO SEX
+                                   DIR.TELEFONO PHONE_NUMBER
                                 FROM MCA.MCA_CUENTAS CTS,
                                      MGI.MGI_CLIENTES CL,
                                      (

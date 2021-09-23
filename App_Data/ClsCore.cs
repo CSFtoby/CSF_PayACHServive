@@ -169,19 +169,24 @@ namespace CSF_PayACHServive
         }
 
         void Responce(ClsTransfer transfer, ClsStatus status, ref string JSONResponse, string transctionType = " ") {
+            
             string oErr = string.Empty;
+            ClsPersonalData personalData = new ClsPersonalData();
+
             try
             {
                 DataTable personal = da.Personal_data(transfer.accountNumber);
-                string id = string.Empty;
-                string jsonString = string.Empty;
 
                 foreach (DataRow row in personal.Rows)
                 {
-                    id = row["ID_NUMBER"].ToString();
+                    personalData.nameRecived = row["NAME"].ToString();
+                    personalData.idRecived = row["ID_NUMBER"].ToString();
+                    personalData.idType = Convert.ToInt32(row["ID_TYPE"].ToString());
+                    personalData.phone = row["PHONE_NUMBER"].ToString();
+                    personalData.acountType = row["ACCOUNT_TYPE"].ToString();            
                 }
 
-                if (transfer.idRecived.Equals(id))
+                if (transfer.idRecived.Equals(personalData.idRecived))
                 {
                     DataTable dt = da.Data_Transaction(transfer.accountNumber);
                     var responce = new ClsTransferResponse
