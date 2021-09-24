@@ -189,6 +189,29 @@ namespace CSF_PayACHServive
                 if (transfer.idRecived.Equals(personalData.idRecived))
                 {
                     DataTable dt = da.Data_Transaction(transfer.accountNumber);
+                    bool cuenta_valida = da.valida_cuenta(transfer.accountNumber);
+                    bool exito_credito = false;
+                    
+                    if (cuenta_valida || status.SubStatusMessage.Equals("Success")) {
+                        DataTable dtcito = da.Data_Transaction(transfer.accountNumber);
+                        int codigo_agencia;
+                        int codigo_empresa;
+                        int codigo_sub_aplicacion;
+
+                        if (dtcito.Rows.Count > 0)
+                        {
+                            codigo_agencia = Int32.Parse(dt.Rows[0]["CODIGO_AGENCIA"].ToString());
+                            codigo_empresa = Int32.Parse(dt.Rows[0]["CODIGO_EMPRESA"].ToString());
+                            codigo_sub_aplicacion = Int32.Parse(dt.Rows[0]["CODIGO_SUB_APLICACION"].ToString());
+
+
+                        }
+                        else { 
+                        
+                        }
+
+                    }
+                
                     var responce = new ClsTransferResponse
                     {
                         statusRequest = "Success",
@@ -203,7 +226,7 @@ namespace CSF_PayACHServive
                         }
                     };
 
-                    JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
+                JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
                 }
                 else {
                     status.StatusCode = "0000";

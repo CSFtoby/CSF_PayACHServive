@@ -234,5 +234,48 @@ namespace CSF_PayACHServive
             return da;
         }
         #endregion
+
+        //es en este apartado donde se llama el procedimiento que hace el credito a la cuenta del afiliado
+        #region paquete
+        public bool MCA_K_AHORROS(string cuenta, string Codigo)
+        {
+            bool returno = false;
+            int cuentaInt = Convert.ToInt32(cuenta);
+
+            OracleCommand command = new OracleCommand();
+
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
+                {
+                    string query = @"MCA.MCA_P_DC_CREDITO";
+
+                    command.CommandText = query;
+                    command.Connection = connection;
+                    command.Parameters.Add("P_CUENTA", OracleDbType.Int32).Value = cuentaInt;
+                    command.Parameters.Add("P_OPERACION", OracleDbType.Int32).Value = Codigo;
+
+                    if (connection.State.ToString().ToUpper().Equals("CLOSED"))
+                        connection.Open();
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.ExecuteNonQuery();
+
+                    command.Dispose();
+                    connection.Close();
+                    returno = true;
+
+                }
+            }
+
+            catch (Exception ex)
+            {
+                returno = false;
+                throw new Exception($"{ex.TargetSite}: {ex.Message}", ex.InnerException);
+            }
+
+            return returno;
+        }
+        #endregion
     }
 }

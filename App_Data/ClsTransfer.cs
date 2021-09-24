@@ -24,6 +24,7 @@ namespace CSF_PayACHServive
         public string bankCode { get; set; }
         public string concept { get; set; }
         public string nameTransffer { get; set; }
+        public char currency_code { get; set; }
         public ClsStatus statusResponse { get; set; }
     }
 }
