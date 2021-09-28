@@ -148,7 +148,6 @@ namespace CSF_PayACHServive
                 }
 
                 Responce(JsonRes, status, ref JSONResponce);
-
             }
             catch (Exception ex)
             {
@@ -159,12 +158,8 @@ namespace CSF_PayACHServive
 
                 log(status.StatusCode + " " + status.StatusMessage + " " + status.SubStatusCode + " " + status.SubStatusMessage);
                 error_interno = true;
-
-                //bool save = da.insert_Transfer_fist(transaction.chanel, transaction.user, transaction.pass, transaction.reference_code, transaction.service, transaction.first_name, transaction.last_name, transaction.account_number, transaction.Bank_code);
-                //da.inser_Error(transaction.account_number, status.SubStatusMessage);
-                //da.insert_Error_bitacora(status.SubStatusMessage + " error= " + ex.Message, transaction.account_number, Convert.ToDecimal(transaction.destination_amount));
             }
-
+            
             return JSONResponce;
         }
 
@@ -204,54 +199,70 @@ namespace CSF_PayACHServive
                             codigo_empresa = Int32.Parse(dt.Rows[0]["CODIGO_EMPRESA"].ToString());
                             codigo_sub_aplicacion = Int32.Parse(dt.Rows[0]["CODIGO_SUB_APLICACION"].ToString());
 
+                            bool insert = da.insert_firts(transfer.nameRecived, transfer.idRecived, transfer.nameTransffer, transfer.idSend,
+                                                          transfer.phone, transfer.typeID, transfer.amount, transfer.typeTransaction
+                                                          ,transfer.codeBankRecived, transfer.codeBankSend, transfer.accountNumber, codigo_sub_aplicacion,
+                                                          codigo_agencia, status.StatusMessage, status.SubStatusMessage, transfer.currency_code
+                                                          );
+                            if (insert) {
+                                decimal comision = 20.00M;
+                                int codeOperation = da.obtener_codigo_operation(transfer.accountNumber, transfer.idRecived, transfer.phone, transfer.amount);
+                                bool exito = da.MCA_K_AHORROS(Convert.ToInt32(transfer.accountNumber), codigo_sub_aplicacion, codigo_agencia, codigo_empresa, transfer.amount, comision, codeOperation);
 
-                        }
-                        else { 
-                        
-                        }
+                                if (exito)
+                                {
+                                    DataTable dtTrans = da.inf_Transfer(codeOperation);
+                                    string statusRespinse = string.Empty;
+                                    string resultTrans = string.Empty;
+                                    string descrpTrans = string.Empty;
+                                    int idTrans = 0;
 
+                                    foreach (DataRow row in dtTrans.Rows)
+                                    {
+                                        statusRespinse = dtTrans.Rows[0]["STATUS_REQUEST"].ToString();
+                                        resultTrans = dtTrans.Rows[0]["STATUS_REQUEST"].ToString();
+                                        descrpTrans = dtTrans.Rows[0]["STATUS_REQUEST"].ToString();
+                                        idTrans =  Convert.ToInt32(dtTrans.Rows[0]["STATUS_REQUEST"].ToString());
+                                    }
+
+                                    var responce = new ClsTransferResponse
+                                    {
+                                        statusRequest = statusRespinse,
+                                        result = resultTrans,
+                                        descriptionStatus = descrpTrans,
+                                        transactionId = idTrans,
+                                        statusResponse = new ClsStatus()
+                                        {
+                                            StatusCode = status.StatusCode,
+                                            StatusMessage = status.StatusMessage,
+                                            SubStatusCode = status.SubStatusCode,
+                                            SubStatusMessage = status.SubStatusMessage
+                                        }
+                                    };
+
+                                    JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
+                                }
+                                else {
+                                    var stErr = Error(status);
+                                    JSONResponse = System.Text.Json.JsonSerializer.Serialize(stErr);
+                                }
+                            }
+                            else
+                            {
+                                var stErr = Error(status);
+                                JSONResponse = System.Text.Json.JsonSerializer.Serialize(stErr);
+                            }
+                        }
+                        else {
+                            var stErr = Error(status);
+                            JSONResponse = System.Text.Json.JsonSerializer.Serialize(stErr);
+                        }
                     }
-                
-                    var responce = new ClsTransferResponse
-                    {
-                        statusRequest = "Success",
-                        result = "Ok",
-                        descriptionStatus = "La transacción de realizó con exito",
-                        transactionId = 1,
-                        statusResponse = new ClsStatus() { 
-                            StatusCode = status.StatusCode,
-                            StatusMessage = status.StatusMessage,
-                            SubStatusCode = status.SubStatusCode,
-                            SubStatusMessage = status.SubStatusMessage
-                        }
-                    };
-
-                JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
                 }
                 else {
-                    status.StatusCode = "0000";
-                    status.StatusMessage = "Internal Error";
-                    status.SubStatusCode = "0008";
-                    status.SubStatusMessage = "Rejected by internal validation";
-
-                    var responce = new ClsTransferResponse
-                    {
-                        statusRequest = "Rejected",
-                        result = "Bad",
-                        descriptionStatus = "La transaccion fallo",
-                        transactionId = 0,
-                        statusResponse = new ClsStatus()
-                        {
-                            StatusCode = status.StatusCode,
-                            StatusMessage = status.StatusMessage,
-                            SubStatusCode = status.SubStatusCode,
-                            SubStatusMessage = status.SubStatusMessage
-                        }
-                    };
-
-                    JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
+                    var stErr = Error(status);
+                    JSONResponse = System.Text.Json.JsonSerializer.Serialize(stErr);
                 }
-                
             }
             catch (Exception ex)
             {
@@ -261,6 +272,31 @@ namespace CSF_PayACHServive
                 status.SubStatusMessage = "System Error";
                 oErr = ex.Message;
             }
+        }
+
+        public ClsTransferResponse Error(ClsStatus status) {
+
+            status.StatusCode = "0000";
+            status.StatusMessage = "Internal Error";
+            status.SubStatusCode = "0008";
+            status.SubStatusMessage = "Rejected by internal validation";
+
+            var responce = new ClsTransferResponse
+            {
+                statusRequest = "Error",
+                result = "Bad",
+                descriptionStatus = "Hubo un error al efectuar la transaccion",
+                transactionId = 0,
+                statusResponse = new ClsStatus()
+                {
+                    StatusCode = status.StatusCode,
+                    StatusMessage = status.StatusMessage,
+                    SubStatusCode = status.SubStatusCode,
+                    SubStatusMessage = status.SubStatusMessage
+                }
+            };
+
+            return responce;
         }
 
     }

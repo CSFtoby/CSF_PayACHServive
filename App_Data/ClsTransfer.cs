@@ -14,17 +14,17 @@ namespace CSF_PayACHServive
         public string user { get; set; }
         public string pass { get; set; }
         public string idRecived { get; set; }
+        public int typeID { get; set; }
         public string idSend { get; set; }
-        public DateTime dateTransaction { get; set; }
+        public string phone { get; set; }
         public string nameRecived { get; set; }
         public string codeBankRecived { get; set; }
         public string codeBankSend { get; set; }
         public string accountNumber { get; set; }
         public decimal amount { get; set; }
-        public string bankCode { get; set; }
+        public decimal comision { get; set; }
         public string concept { get; set; }
         public string nameTransffer { get; set; }
         public char currency_code { get; set; }
-        public ClsStatus statusResponse { get; set; }
     }
 }
