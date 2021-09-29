@@ -13,7 +13,6 @@ namespace CSF_PayACHServive
         public string idTransaccion { get; set; }
         public DateTime dateTransaction { get; set; }
         public string currency { get; set; }
-        public string participanteIndirecto { get; set; }
         public string bankCodeSend { get; set; }
         public string accountNumber { get; set; }
         public decimal amount { get; set; }

@@ -8,13 +8,10 @@ using System.Text;
 
 namespace CSF_PayACHServive 
 {
-    public class ClsTransferResponse
+    public class ClsAcountData
     {
-        public int codTransaction { get; set; }
-        public string statusRequest { get; set; }
-        public string result { get; set; }
-        public string descriptionStatus { get; set; }
-        public int transactionId { get; set; }
+        public string tipeAcount { get; set; }
+        public ClsPersonalData personalInfo { get; set; }
         public ClsStatus statusResponse { get; set; }
     }
 }

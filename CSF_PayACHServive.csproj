@@ -99,8 +99,10 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Data\ClsCoreStatusRequest.cs" />
     <Compile Include="App_Data\ClsCredencials.cs" />
     <Compile Include="App_Data\ClsPersonalData.cs" />
+    <Compile Include="App_Data\ClsAcountData.cs" />
     <Compile Include="App_Data\ClsStatusTransfer.cs" />
     <Compile Include="App_Data\ClsStatus.cs" />
     <Compile Include="App_Data\ClsTransferResponse.cs" />

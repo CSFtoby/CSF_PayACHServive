@@ -11,8 +11,7 @@ namespace CSF_PayACHServive
     public class ClsTransfer
     {
         public string typeTransaction { get; set; }
-        public string user { get; set; }
-        public string pass { get; set; }
+        public ClsCredencials credencials { get; set; }
         public string idRecived { get; set; }
         public int typeID { get; set; }
         public string idSend { get; set; }
@@ -22,7 +21,6 @@ namespace CSF_PayACHServive
         public string codeBankSend { get; set; }
         public string accountNumber { get; set; }
         public decimal amount { get; set; }
-        public decimal comision { get; set; }
         public string concept { get; set; }
         public string nameTransffer { get; set; }
         public char currency_code { get; set; }

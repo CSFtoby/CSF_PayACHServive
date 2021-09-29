@@ -136,6 +136,47 @@ namespace CSF_PayACHServive
             }
             return returno;
         }
+
+        public bool valida_esistencia_operation(int operation)
+        {
+            bool returno = false;
+            OracleCommand command = new OracleCommand();
+            OracleDataReader reader;
+
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
+                {
+                    string sql = @"SELECT
+                                        OPERATION_CODE
+                                    FROM MCA.MCA_ACH_MOVIMIENTOS
+                                    WHERE OPERATION_CODE = :pa_operationt";
+                    command.CommandText = sql;
+                    command.Connection = connection;
+                    command.Parameters.Add("pa_operationt", OracleDbType.Int32).Value = operation;
+                    connection.Open();
+
+                    reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        if (String.IsNullOrEmpty(reader["OPERATION_CODE"].ToString()))
+                            returno = false;
+                        else
+                            returno = true;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+                throw new Exception("Error en " + ex.TargetSite + "  " + ex.Message);
+            }
+            return returno;
+        }
+
         #endregion
 
         #region Informacion general
@@ -233,6 +274,137 @@ namespace CSF_PayACHServive
             }
             return da;
         }
+
+        //obtener el codigo de operacion una vez se haya logrado el credito 
+        public int obtener_codigo_operation(string accaount, string id_recived, string phone, decimal amount)
+        {
+            int returno = 0;
+            OracleCommand command = new OracleCommand();
+            OracleDataReader reader;
+
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
+                {
+                    string sql = @"SELECT MAX(OPERATION_CODE) OPERATION_CODE
+                                    FROM MCA.MCA_ACH_MOVIMIENTOS
+                                   WHERE ACOUNT_NUMBER=:pa_acount
+                                    AND ID_RECIVED = :pa_id
+                                    AND PHONE = :pa_phone
+                                    AND AMOUNT = :pa_amount";
+                    command.CommandText = sql;
+                    command.Connection = connection;
+                    command.Parameters.Add("pa_acaount", OracleDbType.Varchar2).Value = accaount;
+                    command.Parameters.Add("pa_id", OracleDbType.Varchar2).Value = id_recived;
+                    command.Parameters.Add("pa_phone", OracleDbType.Varchar2).Value = phone;
+                    command.Parameters.Add("pa_amount", OracleDbType.Decimal).Value = amount;
+                    connection.Open();
+
+                    reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        if (reader["OPERATION_CODE"].ToString() != null)
+                            returno = Convert.ToInt32(reader["OPERATION_CODE"]);
+                        else
+                            returno = 0;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                returno = 0;
+                throw new Exception("Error en " + ex.TargetSite + "  " + ex.Message);
+            }
+            return returno;
+        }
+
+        public DataTable inf_Transfer(int operacion)
+        {
+            DataTable dt = new DataTable();
+            OracleCommand command = new OracleCommand();
+
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
+                {
+                    string sql = @"SELECT OPERATION_CODE
+                                        ,TRANSACCTION_ID, 
+                                        STATUS_REQUEST, 
+                                        RESULT_TRANSCTION, 
+                                        DESCRIPTION_STATUS
+                                    FROM MCA.MCA_ACH_MOVIMIENTOS
+                                        WHERE OPERATION_CODE = :operation";
+
+                    command.CommandText = sql;
+                    command.Connection = connection;
+                    command.Parameters.Add("operation", operacion);
+
+                    OracleDataAdapter dataAdapter = new OracleDataAdapter(command);
+
+                    try
+                    {
+                        dataAdapter.Fill(dt);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("Error en " + e.TargetSite.ToString() + " " + e.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en " + ex.TargetSite + "  " + ex.Message);
+            }
+            return dt;
+        }
+
+        public DataTable inf_Status(int operacion)
+        {
+            DataTable dt = new DataTable();
+            OracleCommand command = new OracleCommand();
+
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
+                {
+                    string sql = @"SELECT
+                                    TRANSACCTION_ID,
+                                    DATE_TRANSACTION,
+                                    CURRENCY_CODE,
+                                    CODE_BANK_SEND,
+                                    ACOUNT_NUMBER,
+                                    AMOUNT,
+                                    RESULT_TRANSCTION,
+                                    DESCRIPTION_STATUS
+                                FROM MCA.MCA_ACH_MOVIMIENTOS
+                                WHERE OPERATION_CODE = :pa_operation";
+
+                    command.CommandText = sql;
+                    command.Connection = connection;
+                    command.Parameters.Add("pa_operation", operacion);
+
+                    OracleDataAdapter dataAdapter = new OracleDataAdapter(command);
+
+                    try
+                    {
+                        dataAdapter.Fill(dt);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("Error en " + e.TargetSite.ToString() + " " + e.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en " + ex.TargetSite + "  " + ex.Message);
+            }
+            return dt;
+        }
+
         #endregion
 
         #region Logs
@@ -386,88 +558,6 @@ namespace CSF_PayACHServive
         
         }
 
-        //obtener el codigo de operacion una vez se haya logrado el credito 
-        public int obtener_codigo_operation(string accaount, string id_recived, string phone, decimal amount)
-        {
-            int returno = 0;
-            OracleCommand command = new OracleCommand();
-            OracleDataReader reader;
-
-            try
-            {
-                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
-                {
-                    string sql = @"SELECT MAX(OPERATION_CODE) OPERATION_CODE
-                                    FROM MCA.MCA_ACH_MOVIMIENTOS
-                                   WHERE ACOUNT_NUMBER=:pa_acount
-                                    AND ID_RECIVED = :pa_id
-                                    AND PHONE = :pa_phone
-                                    AND AMOUNT = :pa_amount";
-                    command.CommandText = sql;
-                    command.Connection = connection;
-                    command.Parameters.Add("pa_acaount", OracleDbType.Varchar2).Value = accaount;
-                    command.Parameters.Add("pa_id", OracleDbType.Varchar2).Value = id_recived;
-                    command.Parameters.Add("pa_phone", OracleDbType.Varchar2).Value = phone;
-                    command.Parameters.Add("pa_amount", OracleDbType.Decimal).Value = amount;
-                    connection.Open();
-
-                    reader = command.ExecuteReader();
-
-                    if (reader.HasRows)
-                    {
-                        reader.Read();
-                        if (reader["OPERATION_CODE"].ToString() != null)
-                            returno = Convert.ToInt32(reader["OPERATION_CODE"]);
-                        else
-                            returno = 0;
-                    }
-
-                }
-            }
-            catch (Exception ex)
-            {
-                returno = 0;
-                throw new Exception("Error en " + ex.TargetSite + "  " + ex.Message);
-            }
-            return returno;
-        }
-
-        public DataTable inf_Transfer(int operacion) {
-            DataTable dt = new DataTable();
-            OracleCommand command = new OracleCommand();
-
-            try {
-                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
-                {
-                    string sql = @"SELECT TRANSACCTION_ID, 
-                                        STATUS_REQUEST, 
-                                        RESULT_TRANSCTION, 
-                                        DESCRIPTION_STATUS
-                                    FROM MCA.MCA_ACH_MOVIMIENTOS
-                                        WHERE OPERATION_CODE = :operation";
-
-                    command.CommandText = sql;
-                    command.Connection = connection;
-                    command.Parameters.Add("operation", operacion);
-
-                    OracleDataAdapter dataAdapter = new OracleDataAdapter(command);
-
-                    try
-                    {
-                        dataAdapter.Fill(dt);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new Exception("Error en " + e.TargetSite.ToString() + " " + e.Message);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error en " + ex.TargetSite + "  " + ex.Message);
-            }
-            return dt;
-        }
         #endregion
     }
 }

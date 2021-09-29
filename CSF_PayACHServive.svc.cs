@@ -18,25 +18,5 @@ namespace CSF_PayACHServive
             ClsCore cre = new ClsCore();
             return cre.porcessRequest(JSONRequest);
         }
-
-        public string GetDataRequest(string JSONRequest)
-        {
-            ClsCore cre = new ClsCore();
-            return cre.porcessRequest(JSONRequest);
-        }
-
-        public CompositeType GetDataUsingDataContract(CompositeType composite)
-        {
-            if (composite == null)
-            {
-                throw new ArgumentNullException("composite");
-            }
-            if (composite.BoolValue)
-            {
-                composite.StringValue += "Suffix";
-            }
-            return composite;
-        }
-
     }
 }
