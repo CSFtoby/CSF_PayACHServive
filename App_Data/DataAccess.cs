@@ -459,6 +459,7 @@ namespace CSF_PayACHServive
             {
                 returno = false;
                 throw new Exception($"{ex.TargetSite}: {ex.Message}", ex.InnerException);
+                log($"{ex.TargetSite}:  {ex.Message}" + ex.InnerException);
             }
 
             return returno;

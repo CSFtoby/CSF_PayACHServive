@@ -271,6 +271,7 @@ namespace CSF_PayACHServive
                                                     SubStatusMessage = status.SubStatusMessage
                                                 }
                                             };
+                                            log(responce.transactionId + " --> " + responce.result + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
                                             JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
                                         }
                                         else
@@ -342,6 +343,7 @@ namespace CSF_PayACHServive
                                 else
                                 {
                                     tipoCuenta = "Tipo de cuenta no valida";
+                                    log( tipoCuenta + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
                                     var ErroSearch = ErrorBusqueda(status, tipoCuenta);
                                     JSONResponse = System.Text.Json.JsonSerializer.Serialize(ErroSearch);
                                 }
@@ -366,6 +368,7 @@ namespace CSF_PayACHServive
                                     SubStatusMessage = status.SubStatusMessage
                                 }
                             };
+                            log(accounData.personalInfo.nameRecived + " --> " + accounData.tipeAcount + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
                             JSONResponse = System.Text.Json.JsonSerializer.Serialize(accounData);
                         }
                         else
@@ -398,7 +401,7 @@ namespace CSF_PayACHServive
                                 SubStatusMessage = status.SubStatusMessage
                             }
                         };
-
+                        log(status.StatusMessage + " " + status.SubStatusMessage);
                         JSONResponse = System.Text.Json.JsonSerializer.Serialize(defaultR);
                         break;
                 }
@@ -424,7 +427,7 @@ namespace CSF_PayACHServive
                         SubStatusMessage = status.SubStatusMessage
                     }
                 };
-
+                log(status.StatusMessage + " " + status.SubStatusMessage);
                 JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
             }
         }
@@ -455,6 +458,7 @@ namespace CSF_PayACHServive
                             SubStatusMessage = status.SubStatusMessage
                         }
                     };
+                    log(statusResult.accountNumber + " --> "+ statusResult.amount + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
                     JSONResponse = System.Text.Json.JsonSerializer.Serialize(statusResult);
                 }
                 else
@@ -482,7 +486,7 @@ namespace CSF_PayACHServive
                             SubStatusMessage = status.SubStatusMessage
                         }
                     };
-
+                    log(status.StatusMessage + " " + status.SubStatusMessage);
                     JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
                 }
             }
@@ -511,7 +515,7 @@ namespace CSF_PayACHServive
                         SubStatusMessage = status.SubStatusMessage
                     }
                 };
-
+                log(status.StatusMessage + " " + status.SubStatusMessage);
                 JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
             }
         }
@@ -542,7 +546,7 @@ namespace CSF_PayACHServive
                     SubStatusMessage = status.SubStatusMessage
                 }
             };
-
+            log(operation + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
             return responce;
         }
 
@@ -577,6 +581,8 @@ namespace CSF_PayACHServive
             };
 
             return accounData;
+            log (status.StatusMessage + " " + status.SubStatusMessage);
+            log(accounData.personalInfo.nameRecived + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
         }
 
     }
