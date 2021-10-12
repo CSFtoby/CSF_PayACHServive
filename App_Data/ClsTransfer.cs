@@ -14,6 +14,7 @@ namespace CSF_PayACHServive
         public ClsCredencials credencials { get; set; }
         public string idRecived { get; set; }
         public int typeID { get; set; }
+        public string mail { get; set; }
         public string idSend { get; set; }
         public string phone { get; set; }
         public string nameRecived { get; set; }

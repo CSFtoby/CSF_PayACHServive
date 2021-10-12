@@ -5,7 +5,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Security;
 using System.Runtime.Serialization;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
@@ -273,6 +277,7 @@ namespace CSF_PayACHServive
                                             };
                                             log(responce.transactionId + " --> " + responce.result + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
                                             JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
+                                            p_send_mail(transfer.mail, transfer.amount, transfer.nameRecived, transfer.nameTransffer);
                                         }
                                         else
                                         {
@@ -583,6 +588,49 @@ namespace CSF_PayACHServive
             return accounData;
             log (status.StatusMessage + " " + status.SubStatusMessage);
             log(accounData.personalInfo.nameRecived + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
+        }
+
+        public void p_send_mail(string destino, decimal monto, string recive, string envia) {
+            try {
+                MailMessage mailMessage = new MailMessage();
+
+                string correo = "tucooperativa@sagradafamilia.hn";
+                string clave = "%XkGJa=5S+=F6@+6";
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                mailMessage.From = new MailAddress(correo);
+                mailMessage.To.Add(destino);
+                mailMessage.Subject = "Transferencia ACH";
+                mailMessage.IsBodyHtml = true;
+                mailMessage.Body = "<HTML><BODY> Estimado " + recive + ".\n\n " +
+                    "\n\n\n\n" +
+                    "Se le informa que ha recivido una transferencia ACH de " + monto + " LPS por parte de " +envia
+                                    +"</BODY></HTML>";
+
+                AlternateView alternateView = AlternateView.CreateAlternateViewFromString(mailMessage.Body, null, "text/html");
+                mailMessage.AlternateViews.Add(alternateView);
+
+                SmtpClient client = new SmtpClient("correo.sagradafamilia.hn", 587);
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new System.Net.NetworkCredential(correo, clave);
+
+                System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+                {
+                    return true;
+                };
+
+                client.Send(mailMessage);
+                mailMessage.Dispose();
+                mailMessage = null;
+            }
+            catch (Exception e)
+            {
+                log("error al enviar el correo a "+ destino +" --> "+e.Message);
+                throw new Exception();
+            }
         }
 
     }
