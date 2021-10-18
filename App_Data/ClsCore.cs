@@ -33,6 +33,11 @@ namespace CSF_PayACHServive
             return "OK";
         }
 
+        /// <summary>
+        /// Proceso de transferencia, valida todos los elementos que hacen una cuenta valida
+        /// </summary>
+        /// <param name="JSONRequest"></param>
+        /// <returns></returns>
         public string porcessRequest(string JSONRequest)
         {
 
@@ -172,13 +177,20 @@ namespace CSF_PayACHServive
                 status.SubStatusCode = "1001";
                 status.SubStatusMessage = "System Error";
 
-                log(status.StatusCode + " " + status.StatusMessage + " " + status.SubStatusCode + " " + status.SubStatusMessage);
+                log(status.StatusCode + " " + status.StatusMessage + " " + status.SubStatusCode + " " + status.SubStatusMessage + " Error en JSON");
                 error_interno = true;
                 return JSONResponce;
             }
             return JSONResponce;
         }
 
+        /// <summary>
+        /// efectua los procesos necesarios para responder, en este apartado se hace el credito de la trasnferencia y el proceso contable 
+        /// </summary>
+        /// <param name="transfer"></param>
+        /// <param name="status"></param>
+        /// <param name="JSONResponse"></param>
+        /// <param name="transctionType"></param>
         void Responce(ClsTransfer transfer, ClsStatus status, ref string JSONResponse, string transctionType = " ")
         {
 
@@ -322,6 +334,7 @@ namespace CSF_PayACHServive
                                 status.SubStatusMessage = "information does not match";
                             }
 
+                            log(status.StatusCode + " " + status.StatusMessage + " " + status.SubStatusCode + " " + status.SubStatusMessage + " Error en Respuesta");
                             var stErr = Error(status, 0);
                             JSONResponse = System.Text.Json.JsonSerializer.Serialize(stErr);
                         }
@@ -406,7 +419,7 @@ namespace CSF_PayACHServive
                                 SubStatusMessage = status.SubStatusMessage
                             }
                         };
-                        log(status.StatusMessage + " " + status.SubStatusMessage);
+                        log(status.StatusMessage + " " + status.SubStatusMessage + " Error desde la transaccion");
                         JSONResponse = System.Text.Json.JsonSerializer.Serialize(defaultR);
                         break;
                 }
@@ -432,11 +445,17 @@ namespace CSF_PayACHServive
                         SubStatusMessage = status.SubStatusMessage
                     }
                 };
-                log(status.StatusMessage + " " + status.SubStatusMessage);
+                log(status.StatusMessage + " " + status.SubStatusMessage + responce.descriptionStatus);
                 JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
             }
         }
 
+        /// <summary>
+        /// trae la informacion necesaria para toda operacion procesada, erronea o correcta
+        /// </summary>
+        /// <param name="statusRequest"></param>
+        /// <param name="status"></param>
+        /// <param name="JSONResponse"></param>
         void ResponceStatus(ClsCoreStatusRequest statusRequest, ClsStatus status, ref string JSONResponse)
         {
             try
@@ -525,6 +544,12 @@ namespace CSF_PayACHServive
             }
         }
 
+        /// <summary>
+        /// trae la lista de errores en las transacciones
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="operation"></param>
+        /// <returns></returns>
         public ClsTransferResponse Error(ClsStatus status, int operation)
         {
 
@@ -555,6 +580,12 @@ namespace CSF_PayACHServive
             return responce;
         }
 
+        /// <summary>
+        /// trae la lista de errores de busqueda
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="_tipoCuenta"></param>
+        /// <returns></returns>
         public ClsAcountData ErrorBusqueda(ClsStatus status, string _tipoCuenta)
         {
             if (string.IsNullOrEmpty(status.StatusCode) || status.StatusCode.Equals("5000"))
@@ -590,6 +621,13 @@ namespace CSF_PayACHServive
             log(accounData.personalInfo.nameRecived + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
         }
 
+        /// <summary>
+        /// envio de correos de notificacion 
+        /// </summary>
+        /// <param name="destino"></param>
+        /// <param name="monto"></param>
+        /// <param name="recive"></param>
+        /// <param name="envia"></param>
         public void p_send_mail(string destino, decimal monto, string recive, string envia) {
             try {
                 MailMessage mailMessage = new MailMessage();

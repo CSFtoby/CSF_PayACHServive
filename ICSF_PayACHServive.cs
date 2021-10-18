@@ -9,7 +9,14 @@ using System.Data;
 
 namespace CSF_PayACHServive
 {
-    // NOTA: puede usar el comando "Rename" del menú "Refactorizar" para cambiar el nombre de interfaz "IService1" en el código y en el archivo de configuración a la vez.
+    /// <summary>
+    /// GetData() reciibe un JSON diferenciado por cualquiera de las tres transacciones
+    /// a.- Transfer: metodo utilizado para efectuar las transferencias 
+    /// b.- account search: busqueda y validacion de la cuenta ingresada 
+    /// c.- status operation: valida el status de una transaccion ya efectuada
+    /// </summary>
+    /// <param name="JSONRequest"></param>
+    /// <returns></returns>
     [ServiceContract]
     public interface ICSF_PayACHServive
     {
