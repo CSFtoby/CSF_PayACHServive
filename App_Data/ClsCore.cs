@@ -64,6 +64,7 @@ namespace CSF_PayACHServive
 
                     Responce(JsonRes, status, ref JSONResponce);
                     log(status.StatusCode + " " + status.StatusMessage + " " + status.SubStatusCode + " " + status.SubStatusMessage);
+                    da.insert_err(status.StatusMessage, status.SubStatusMessage, "N/A", 0.0M);
                     return JSONResponce;
                 }
 
