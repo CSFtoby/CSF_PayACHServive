@@ -556,7 +556,37 @@ namespace CSF_PayACHServive
                 return false;
                 log("Error en " + ex.TargetSite + "  " + ex.Message);
             }
-        
+        }
+
+        public void insert_err(string status, string sub_status, string acount, decimal amount)
+        {
+            OracleCommand command = new OracleCommand();
+
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(cadenaConexionOracle))
+                {
+                    string sql = @"Insert into MCA_BITACORA_ACH (STATUS_MESSAGGE,SUB_STATUS_MESSAGGE,FECHA,CUENTA,MONTO) 
+                                            values (:pa_status,:pa_sub_status,to_date(sysdate,'DD/MM/RRRR'),:pa_acount,:pa_amount)";
+                    command.CommandText = sql;
+                    command.Connection = connection;
+
+                    command.Parameters.Add("pa_status", OracleDbType.Varchar2, 50).Value = status;
+                    command.Parameters.Add("pa_sub_status", OracleDbType.Varchar2, 25).Value = sub_status;
+                    command.Parameters.Add("pa_acount", OracleDbType.Varchar2, 50).Value = acount;
+                    command.Parameters.Add("pa_amount", OracleDbType.Decimal).Value = amount;
+
+                    if (connection.State.ToString().ToUpper().Equals("CLOSED"))
+                        connection.Open();
+
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                log("Error en " + ex.TargetSite + "  " + ex.Message);
+            }
         }
 
         #endregion

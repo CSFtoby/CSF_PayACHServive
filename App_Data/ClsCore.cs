@@ -288,6 +288,7 @@ namespace CSF_PayACHServive
                                                 }
                                             };
                                             log(responce.transactionId + " --> " + responce.result + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
+                                            da.insert_err(status.StatusMessage, status.SubStatusMessage, transfer.accountNumber, transfer.amount);
                                             JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
                                             p_send_mail(transfer.mail, transfer.amount, transfer.nameRecived, transfer.nameTransffer);
                                         }
@@ -335,6 +336,7 @@ namespace CSF_PayACHServive
                             }
 
                             log(status.StatusCode + " " + status.StatusMessage + " " + status.SubStatusCode + " " + status.SubStatusMessage + " Error en Respuesta");
+                            da.insert_err(status.StatusMessage, status.SubStatusMessage, transfer.accountNumber, transfer.amount);
                             var stErr = Error(status, 0);
                             JSONResponse = System.Text.Json.JsonSerializer.Serialize(stErr);
                         }
@@ -362,6 +364,7 @@ namespace CSF_PayACHServive
                                 {
                                     tipoCuenta = "Tipo de cuenta no valida";
                                     log( tipoCuenta + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
+                                    da.insert_err(status.StatusMessage, status.SubStatusMessage, transfer.accountNumber, transfer.amount);
                                     var ErroSearch = ErrorBusqueda(status, tipoCuenta);
                                     JSONResponse = System.Text.Json.JsonSerializer.Serialize(ErroSearch);
                                 }
@@ -387,6 +390,7 @@ namespace CSF_PayACHServive
                                 }
                             };
                             log(accounData.personalInfo.nameRecived + " --> " + accounData.tipeAcount + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
+                            da.insert_err(status.StatusMessage, status.SubStatusMessage, transfer.accountNumber, transfer.amount);
                             JSONResponse = System.Text.Json.JsonSerializer.Serialize(accounData);
                         }
                         else
@@ -420,6 +424,7 @@ namespace CSF_PayACHServive
                             }
                         };
                         log(status.StatusMessage + " " + status.SubStatusMessage + " Error desde la transaccion");
+                        da.insert_err(status.StatusMessage, status.SubStatusMessage, transfer.accountNumber, transfer.amount);
                         JSONResponse = System.Text.Json.JsonSerializer.Serialize(defaultR);
                         break;
                 }
@@ -446,6 +451,7 @@ namespace CSF_PayACHServive
                     }
                 };
                 log(status.StatusMessage + " " + status.SubStatusMessage + responce.descriptionStatus);
+                da.insert_err(status.StatusMessage, status.SubStatusMessage, transfer.accountNumber, transfer.amount);
                 JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
             }
         }
@@ -483,6 +489,7 @@ namespace CSF_PayACHServive
                         }
                     };
                     log(statusResult.accountNumber + " --> "+ statusResult.amount + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
+                    da.insert_err(status.StatusMessage, status.SubStatusMessage, "NA", 0.0M);
                     JSONResponse = System.Text.Json.JsonSerializer.Serialize(statusResult);
                 }
                 else
@@ -511,6 +518,7 @@ namespace CSF_PayACHServive
                         }
                     };
                     log(status.StatusMessage + " " + status.SubStatusMessage);
+                    da.insert_err(status.StatusMessage, status.SubStatusMessage, "N/A", 0.0M);
                     JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
                 }
             }
@@ -540,6 +548,7 @@ namespace CSF_PayACHServive
                     }
                 };
                 log(status.StatusMessage + " " + status.SubStatusMessage);
+                da.insert_err(status.StatusMessage, status.SubStatusMessage, "N/A", 0.0M);
                 JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
             }
         }
@@ -577,6 +586,7 @@ namespace CSF_PayACHServive
                 }
             };
             log(operation + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
+            da.insert_err(status.StatusMessage, status.SubStatusMessage, "N/A", 0.0M);
             return responce;
         }
 
@@ -618,6 +628,7 @@ namespace CSF_PayACHServive
 
             return accounData;
             log (status.StatusMessage + " " + status.SubStatusMessage);
+            da.insert_err(status.StatusMessage, status.SubStatusMessage, "N/A", 0.0M);
             log(accounData.personalInfo.nameRecived + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
         }
 
