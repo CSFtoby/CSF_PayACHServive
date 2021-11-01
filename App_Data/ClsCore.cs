@@ -171,7 +171,7 @@ namespace CSF_PayACHServive
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 status.StatusCode = "1000";
                 status.StatusMessage = "Internal Error";
@@ -430,7 +430,7 @@ namespace CSF_PayACHServive
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 status.StatusCode = "1000";
                 status.StatusMessage = "Internal Error";
@@ -523,7 +523,7 @@ namespace CSF_PayACHServive
                     JSONResponse = System.Text.Json.JsonSerializer.Serialize(responce);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 status.StatusCode = "1000";
                 status.StatusMessage = "Internal Error";
@@ -628,7 +628,6 @@ namespace CSF_PayACHServive
             };
 
             return accounData;
-            log (status.StatusMessage + " " + status.SubStatusMessage);
             da.insert_err(status.StatusMessage, status.SubStatusMessage, "N/A", 0.0M);
             log(accounData.personalInfo.nameRecived + " --> " + status.StatusMessage + " " + status.SubStatusMessage);
         }

@@ -107,6 +107,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Data\ClsCreditCardResponse.cs" />
+    <Compile Include="App_Data\ClsLoanResponse.cs" />
     <Content Include="CSF_PayACHServive.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -115,8 +117,10 @@
     <Compile Include="App_Data\ClsCredencials.cs" />
     <Compile Include="App_Data\ClsPersonalData.cs" />
     <Compile Include="App_Data\ClsAcountData.cs" />
+    <Compile Include="App_Data\ClsLoanRequest.cs" />
     <Compile Include="App_Data\ClsStatusTransfer.cs" />
     <Compile Include="App_Data\ClsStatus.cs" />
+    <Compile Include="App_Data\ClsCreditCardRequest.cs" />
     <Compile Include="App_Data\ClsTransferResponse.cs" />
     <Compile Include="App_Data\ClsTransfer.cs" />
     <Compile Include="App_Data\DataAccess.cs" />
